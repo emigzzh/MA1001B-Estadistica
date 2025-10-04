@@ -1,0 +1,233 @@
+---
+title: "Etapa1ElContexto"
+author: "Laurie Hernández"
+date: "2025-09-26"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+¿Existe alguna correlación entre el nivel de escolaridad y la lectura de la población en México, así como con el tipo de contenidos que leen?
+
+# Exploración de la base de datos
+## Lectura de las bases de datos
+
+Inicialmente, se cargarán todas las bases de datos así como sus respectivos diccionarios: 
+ 
+```{r}
+M19 <- read.csv("Datos_molec_2019-1.csv")
+M20 <- read.csv("Datos_molec_2020-1.csv")
+M21 <- read.csv("Datos_molec_2021-1.CSV")
+M22 <- read.csv("Datos_molec_2022-1.CSV")
+M23 <- read.csv("Datos_molec_2023-1.CSV")
+M24 <- read.csv("Datos_molec_2024-1.csv")
+
+# Leemos los diccionarios también: 
+Dic19 = read.csv("Diccionario_molec_2019-1.csv")
+Dic20 <- read.csv("Diccionario_molec_2020-1.csv")
+Dic21 <- read.csv("Diccionario_molec_2021-1.csv")
+Dic22 <- read.csv("Diccionario_molec_2022-1.csv")
+Dic23 <- read.csv("Diccionario_molec_2023-1.csv")
+Dic24 <- read.csv("Diccionario_molec_2024-1.csv")
+
+```
+
+A continuación se incluye la cantidad de observaciones y variables en cada base de datos: 
+
+M19: 1980 observaciones de 108 variables
+M20: 2010 observaciones de 108 variables
+M21: 1948 observaciones de 108 variables
+M22: 2016 observaciones de 108 variables
+M23: 1996 observaciones de 108 variables
+M24: 2016 observaciones de 108 variables
+
+Se tiene el mismo número de variables para todos los años de datos recopilados, y con base en la documentación de la encuesta MOLEC, cada año se realizan las mismas preguntas con los mismos criterios, lo que permite mayor uniformidad en la investigación con respecto a cada año. 
+
+```{r}
+# A continuación se muestra un ejemplo de header de los datos de 2019
+head(M19)
+```
+
+
+Mientras tanto, en los diccionarios se tiene lo siguiente en términos de observaciones y variables: 
+
+Diccionario 2019: 108 observaciones de 6 variables
+Diccionario 2020: 108 observaciones de 6 variables
+Diccionario 2021: 108 observaciones de 6 variables
+Diccionario 2022: 108 observaciones de 6 variables
+Diccionario 2023: 108 observaciones de 5 variables
+Diccionario 2024: 108 observaciones de 6 variables. 
+
+De las variables de los diccionarios, se tienen 108 observaciones en cada una (correspondiente a la cantidad de variables distintas en la base de datos). Todos a excepción del diccionario 2023 contienen 6 variables distintas. A continuación, se presentan las variables de cada diccionario: 
+
+```{r}
+head(Dic19)
+head(Dic20)
+head(Dic21)
+head(Dic22)
+head(Dic23)
+head(Dic24)
+```
+
+Todos los diccionarios tienen las variables de nombre_campo, tipo, nemónico, catálogo y rango_claves, siendo estas distintas características que pueden tener las variables en la base de datos. No obstante, solo en los diccionarios de 2019, 2020 y 2021 existe la variable de longitud, puesto que en los diccionarios de 2022 y 2024 se reemplaza por una columna X, mientras que en el diccionario 2023 no se encuentra esta columna. 
+
+```{r}
+Dic19 = Dic19[,-2]
+Dic20 <- Dic20[,-2]
+Dic21 <- Dic21[,-2]
+Dic22 <- Dic22[,-2]
+Dic24 <- Dic24[,-2]
+
+head(Dic19)
+
+```
+
+Como vemos, al final ahora todos nuestros diccionarios tienen la misma cantidad y las mismas variables. 
+
+## Aspectos y calidad de las bases de datos
+
+Primero, validamos las dimensiones de las bases de datos y los diccionarios: 
+```{r}
+cat("Dimensiones de la base de datos MOLEC 2019:"); dim(M19)
+cat("Dimensiones de la base de datos MOLEC 2020:"); dim(M20)
+cat("Dimensiones de la base de datos MOLEC 2021:"); dim(M21)
+cat("Dimensiones de la base de datos MOLEC 2022:"); dim(M22)
+cat("Dimensiones de la base de datos MOLEC 2023:"); dim(M23)
+cat("Dimensiones de la base de datos MOLEC 2024:"); dim(M24)
+
+cat("\nDimensiones del diccionario 2019:"); dim(Dic19)
+cat("Dimensiones del diccionario 2020:"); dim(Dic20)
+cat("Dimensiones del diccionario 2021:"); dim(Dic21)
+cat("Dimensiones del diccionario 2022:"); dim(Dic22)
+cat("Dimensiones del diccionario 2023:"); dim(Dic23)
+cat("Dimensiones del diccionario 2024:"); dim(Dic24)
+```
+
+De todas las 108 variables, considerando nuestra pregunta de investigación, se hará uso de las siguientes variables: 
+
+- sexo: el sexo de la persona entrevistada (alfanumérico)
+- edad: edad de la persona entrevistada (alfanumérico)
+- nivel: el año máximo aprobado de escolaridad (alfanumérico)
+- cond_act: condición de actividad en la última semana (alfanumérico)
+- p3_1: frecuencia de lectura de libros en el último año (numérico)
+- p3_2: frecuencia de lectura de revistas en los últimos 3 meses (numérico)
+- p3_5: lectura de páginas de internet, foros o blogs (numérico)
+- p5: motivo principal de lectura de libros (numérico)
+- p6_1 - p6_6: tipo de libro que se leyó (numérico)
+- p11: motivo principal de lectura de revistas (numérico)
+- p12_1 - p12_9: contenido principal de las revistas (numérico)
+- p25: motivo principal de lectura de páginas de internet (numérico)
+- p35: asistencia a escuela primaria en la infancia (numérico)
+
+El objetivo es enfocarse en la frecuencia de lectura de libros, revistas y páginas de internet como medios en tendencia de lectura con base en la investigación realizada. Además, considerar la edad y escolaridad de las personas y realizar una comparativa de esto con respecto a sus intereses de contenido de lectura.
+
+A continuación, se filtrarán los datos para considerar únicamente esas variables de cada base, y posteriormente se realizará una comparativa de porcentaje de NaNs en cada una. Se elegirán las dos bases con menor porcentaje de NaNs, para poder trabajar con una cantidad representativa de datos con buena calidad. 
+
+```{r}
+# Vemos los nombres de las variables y el número de columna correspondiente para cada una, para poder realizar el filtrado adecuado y conservar aquellas variables importantes. Se visualizará solamente la base de datos M19 ya que todas contienen la misma cantidad y las mismas variables. 
+names(M19)
+cat("\n")
+names(M20)
+
+# Vemos que la variable cond_activ y cond_act, si bien son lo mismo, cambian su nomenclatura de M19 a M20, por lo que creamos una columna adicional en el dataframe de M19 con el nombre "cond_act", que tenga los datos de la variable "cond_activ". 
+
+M19["cond_act"] <- M19["cond_activ"]
+
+# creamos un vector de las variables seleccionadas para poder eralizar nuestros filtros finales de las variables. 
+chosenVar <- c("sexo", "edad", "nivel", "cond_act", "p3_1", "p3_2", "p3_3", "p3_4", "p3_5", "p5", "p6_1", "p6_2", "p6_3", "p6_4", "p6_5", "p6_6", "p11", "p12_1","p12_2", "p12_3", "p12_4", "p12_5", "p12_6", "p12_7", "p12_8", "p12_9", "p25", "p35")
+
+
+M19 <- M19[chosenVar]
+M20 <- M20[chosenVar]
+M21 <- M21[chosenVar]
+M22 <- M22[chosenVar]
+M23 <- M23[chosenVar]
+M24 <- M24[chosenVar]
+```
+
+```{r}
+# Podemos ver un overview de las 26 variables restantes con summary(), confirmando que todas las variables son cuantitativas. 
+summary(M19)
+```
+
+```{r}
+# A continuación calculamos el porcentaje de NaNs que hay en cada database: 
+cat("NaNs M19: ")
+sum(is.na(M19)) / length(M19)
+cat("NaNs M20: ")
+sum(is.na(M20)) / length(M20)
+cat("NaNs M21: ")
+sum(is.na(M21)) / length(M21)
+cat("NaNs M22: ")
+sum(is.na(M22)) / length(M22)
+cat("NaNs M23: ")
+sum(is.na(M23)) / length(M23)
+cat("NaNs M24: ")
+sum(is.na(M24)) / length(M24)
+```
+En ninguna base de datos, con base en las 28 variables seleccionadas para el análisis, existe algún NaN. Esto asegura que se trabajará con la mayor cantidad de datos y que todas serán de buena calidad. 
+
+Antes de finalizar con la selección de base o bases de datos, se creará una columna que indique el año de recolección de los datos para cada database: 
+
+```{r}
+M19$year <- 2019
+M20$year <- 2020
+M21$year <- 2021
+M22$year <- 2022
+M23$year <- 2023
+M24$year <- 2024
+
+```
+
+## Elección de base de datos
+Considerando la evolución de usos de medios digitales para la lectura de distintos tipos de textos, se seccionarán las bases de datos además por esta variable llamada "year" que representa el año en el que fue recolectada la información. Tener esta división permitirá indagar más en el aumento de consumo de contenido digital para leer conforme avanzan los años. Para ver esta evolución, se hará uso de las bases de datos de los años pares: 2020, 2022 y 2024. Esto porque representan el uso de medios digitales desde la pandemia de COVID-19 hasta el año pasado, además de que se encuentran suficientemente espaciados los años para identificar alguna tendencia notoria. 
+
+```{r}
+# Fusionamos las tres databases en una llamada MFinal
+MFinal <- rbind(M20, M22, M24)
+```
+
+MFinal contiene 6042 observaciones de 29 variables distintas, con 0 valores vacíos. 
+
+# Descripción de las bases de datos
+
+Las bases de datos utilizadas provienen de la Encuesta Nacional sobre Disponibilidad y Uso de Tecnologías de la Información en los Hogares (MOLEC), levantada anualmente en México entre los años 2019 y 2024. Cada base contiene información sobre los hábitos de lectura de la población mexicana, complementada con datos sociodemográficos que permiten caracterizar de manera más detallada los patrones de consumo cultural y educativo.
+
+Cada base anual (M19–M24) presenta aproximadamente 2000 observaciones (personas encuestadas) y 108 variables (preguntas de la encuesta). El diseño de la encuesta se mantiene constante en los seis años considerados, con las mismas preguntas y categorías de respuesta, lo cual asegura la comparabilidad temporal de los datos. Este aspecto es fundamental para poder analizar cambios en los hábitos de lectura a lo largo del tiempo, especialmente en el contexto de transformaciones sociales y tecnológicas recientes, que han tenido un impacto notorio en la educación y hábitos de lectura no solo a nivel nacional, sino también a nivel global. 
+
+Los diccionarios (Dic19-Dic24) contienen la descripción de cada variable incluida en las bases junto con sus distintas características. Debido a que mostraban algunas discrepancias con respecto a las variables incluídas, se organizaron de tal manera que todos los diccionarios ahora presentan la misma estructura de información. 
+
+La calidad de los datos después de la selección de variables relevantes resultó en no tener ningún valor vacío o NaN, lo que es un resultado increíble para el análisis, puesto que no se requirió una limpieza de datos o eliminación de observaciones para dejar las bases listas. Además, esto permitió la libertad de seleccionar los años que resultaran relevantes para el análisis, más allá de la preocupación por la calidad de los datos. Por ello, se seleccionaron las bases de los años 2020, 2022 y 2024, que permiten observar la evolución y el desarrollo de los hábitos y gustos de lectura en un periodo de tiempo interesante: desde la pandemia hasta el año pasado, donde el uso de contenido digital tanto para aprendizaje como entretenimiento tuvo su auge. 
+
+## Variables seleccionadas y su justificación
+
+De las 108 variables originales, se seleccionaron 28 variables distintas para responder la pregunta de investigación: ¿Existe alguna correlación entre el nivel de escolaridad y la lectura de la población en México, así como con el tipo de contenidos que leen?
+
+Además, se agregó una variable llamada "year" que representa el año de toma de los datos, resultado en un total de 29 variables en la base de datos. 
+
+Las variables se agrupan en sociodemográficas y hábitos de lectura. La mayoría son variables numéricas, con 3 de ellas siendo alfanuméricas, pero predomina el uso de números. 
+
+### Variables sociodemográficas
+
+sexo: permite segmentar los resultados por sexo
+edad: permite identificar tendencias en la lectura entre generaciones
+nivel: máximo nivel educativo aprobado, esta variable es clave para la resolución de la pregunta de investigación. 
+cond_act: condición de actividad en la última semana, permite contextualizar en el estilo de vida de la persona
+year: año en el que se realizó la encuesta
+
+### Variables sobre hábitos de lectura
+
+p3_1, p3_2, p3_5: frecuencia de lectura de libros, revistas y páginas de internet/foros/blogs, para identificar las diferencias entre el consumo de cada uno de estos medios de difusión de lectura. 
+p5, p11, p25: motivos principales de lectura de libros, revistas y contenidos digitales (entretenimiento, aprendizaje, recomendación, entre otros)
+p6_1 – p6_6: tipo de libros leídos (ciencia ficción, literatura clásica, cocina, autoaprendizaje, entre otros). 
+p12_1 – p12_9: contenido principal de las revistas leídas (moda, deportes, política, ciencia, entre otros). 
+p35: asistencia a escuela primaria en la infancia. Permite relacionar el hábito de la lectura con la educación temprana. 
+
+### Justificación de la selección
+
+La selección de estas variables gira en torno al objetivo central del análisis: estudiar la correlación entre el nivel educativo y el tipo de lectura así como su frecuencia. Por ello se mantienen las variables demográficas como nivel educativo y condición de actividad, pero también es importante considerar la frecuencia de la lectura, los motivos y el tipo de material que cada persona lee. 
+
+La inclusión de múltiples tipos de material (libros, revistas, medios digitales) es esencial porque permite identificar no solo si las personas leen más o menos en función de su escolaridad, sino también qué tipo de contenidos prefieren. Esto es relevante en el contexto actual, donde los hábitos de lectura han cambiado significativamente debido a la digitalización y el acceso a internet. 
+
