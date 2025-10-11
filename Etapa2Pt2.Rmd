@@ -1,6 +1,6 @@
 ---
 title: 'Etapa 2 Parte 2: Gráficos'
-author: "Laurie Hernández, Emilio González, Hugo Gamboa"
+author: "Laurie Hernández, Emilio González, Hugo Gamboa, Jacqueline Peña, Pablo Robles"
 date: "2025-10-10"
 output:
   word_document: default
@@ -521,4 +521,5 @@ barplot(tabla,
 
 
 ###Apéndice
+
 
