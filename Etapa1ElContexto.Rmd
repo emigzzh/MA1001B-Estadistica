@@ -9,9 +9,8 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-¿Existe alguna correlación entre el nivel de escolaridad y la lectura de la población en México, así como con el tipo de contenidos que leen?
+# Etapa 1. El contexto y el objetivo
 
-# Exploración de la base de datos
 ## Lectura de las bases de datos
 
 Inicialmente, se cargarán todas las bases de datos así como sus respectivos diccionarios: 
@@ -135,8 +134,8 @@ names(M20)
 
 M19["cond_act"] <- M19["cond_activ"]
 
-# creamos un vector de las variables seleccionadas para poder eralizar nuestros filtros finales de las variables. 
-chosenVar <- c("sexo", "edad", "nivel", "cond_act", "p3_1", "p3_2", "p3_3", "p3_4", "p3_5", "p5", "p6_1", "p6_2", "p6_3", "p6_4", "p6_5", "p6_6", "p11", "p12_1","p12_2", "p12_3", "p12_4", "p12_5", "p12_6", "p12_7", "p12_8", "p12_9", "p25", "p35")
+# creamos un vector de las variables seleccionadas para poder realizar nuestros filtros finales de las variables. 
+chosenVar <- c("sexo", "edad", "nivel", "cond_act", "p3_1", "p3_2", "p3_5", "p5", "p6_1", "p6_2", "p6_3", "p6_4", "p6_5", "p11", "p12_1","p12_2", "p12_3", "p12_4", "p12_5", "p12_6", "p12_7", "p12_8", "p25", "p35")
 
 
 M19 <- M19[chosenVar]
@@ -148,7 +147,7 @@ M24 <- M24[chosenVar]
 ```
 
 ```{r}
-# Podemos ver un overview de las 26 variables restantes con summary(), confirmando que todas las variables son cuantitativas. 
+# Podemos ver un overview de las 24 variables restantes con summary(), confirmando que todas las variables son cuantitativas. 
 summary(M19)
 ```
 
@@ -167,7 +166,7 @@ sum(is.na(M23)) / length(M23)
 cat("NaNs M24: ")
 sum(is.na(M24)) / length(M24)
 ```
-En ninguna base de datos, con base en las 28 variables seleccionadas para el análisis, existe algún NaN. Esto asegura que se trabajará con la mayor cantidad de datos y que todas serán de buena calidad. 
+En ninguna base de datos, con base en las 24 variables seleccionadas para el análisis, existe algún NaN. Esto asegura que se trabajará con la mayor cantidad de datos y que todas serán de buena calidad. 
 
 Antes de finalizar con la selección de base o bases de datos, se creará una columna que indique el año de recolección de los datos para cada database: 
 
@@ -189,7 +188,7 @@ Considerando la evolución de usos de medios digitales para la lectura de distin
 MFinal <- rbind(M20, M22, M24)
 ```
 
-MFinal contiene 6042 observaciones de 29 variables distintas, con 0 valores vacíos. 
+MFinal contiene 6042 observaciones de 25 variables distintas, con 0 valores vacíos. 
 
 # Descripción de las bases de datos
 
@@ -203,9 +202,9 @@ La calidad de los datos después de la selección de variables relevantes result
 
 ## Variables seleccionadas y su justificación
 
-De las 108 variables originales, se seleccionaron 28 variables distintas para responder la pregunta de investigación: ¿Existe alguna correlación entre el nivel de escolaridad y la lectura de la población en México, así como con el tipo de contenidos que leen?
+De las 108 variables originales, se seleccionaron 26 variables distintas para responder la pregunta de investigación: ¿Existe alguna correlación entre el nivel de escolaridad y la lectura de la población en México, así como con el tipo de contenidos que leen?
 
-Además, se agregó una variable llamada "year" que representa el año de toma de los datos, resultado en un total de 29 variables en la base de datos. 
+Además, se agregó una variable llamada "year" que representa el año de toma de los datos, resultado en un total de 25 variables en la base de datos. 
 
 Las variables se agrupan en sociodemográficas y hábitos de lectura. La mayoría son variables numéricas, con 3 de ellas siendo alfanuméricas, pero predomina el uso de números. 
 
@@ -221,7 +220,7 @@ year: año en el que se realizó la encuesta
 
 p3_1, p3_2, p3_5: frecuencia de lectura de libros, revistas y páginas de internet/foros/blogs, para identificar las diferencias entre el consumo de cada uno de estos medios de difusión de lectura. 
 p5, p11, p25: motivos principales de lectura de libros, revistas y contenidos digitales (entretenimiento, aprendizaje, recomendación, entre otros)
-p6_1 – p6_6: tipo de libros leídos (ciencia ficción, literatura clásica, cocina, autoaprendizaje, entre otros). 
+p6_1 – p6_5: tipo de libros leídos (ciencia ficción, literatura clásica, cocina, autoaprendizaje, entre otros). 
 p12_1 – p12_9: contenido principal de las revistas leídas (moda, deportes, política, ciencia, entre otros). 
 p35: asistencia a escuela primaria en la infancia. Permite relacionar el hábito de la lectura con la educación temprana. 
 
@@ -230,5 +229,256 @@ p35: asistencia a escuela primaria en la infancia. Permite relacionar el hábito
 La selección de estas variables gira en torno al objetivo central del análisis: estudiar la correlación entre el nivel educativo y el tipo de lectura así como su frecuencia. Por ello se mantienen las variables demográficas como nivel educativo y condición de actividad, pero también es importante considerar la frecuencia de la lectura, los motivos y el tipo de material que cada persona lee. 
 
 La inclusión de múltiples tipos de material (libros, revistas, medios digitales) es esencial porque permite identificar no solo si las personas leen más o menos en función de su escolaridad, sino también qué tipo de contenidos prefieren. Esto es relevante en el contexto actual, donde los hábitos de lectura han cambiado significativamente debido a la digitalización y el acceso a internet. 
+
+
+# Etapa 2. Comprensión y preparación de datos
+
+## Calidad de los datos
+
+Se retomará el análisis de calidad y la comprensión de los datos a partir del nuevo dataset elaborado con las bases de datos de 2020, 2022 y 2024, así como las variables seleccionadas para el análisis. 
+
+De primera instancia, definimos la dimensión de la base de datos, así como la cantidad de valores faltantes, duplicados y datos sin sentido (aquellos que salgan del rango de valores posibles). 
+
+```{r}
+cat("Las dimensiones del dataset son de ",nrow(MFinal)," observaciones (filas) con ",ncol(MFinal)," columnas (variables)")
+
+cat("\n\nLa cantidad de datos faltantes en el dataset final es de:",sum(is.na(MFinal)), ". Entonces, el porcentaje de datos faltantes es de 0")
+
+# no hay NAs porque ya habíamos filtrado antes. 
+
+dupes <- sum(duplicated(MFinal))
+
+cat("\n\nEn total, la base de datos final tiene",dupes," datos duplicados. Esto representa",(dupes/nrow(MFinal))*100,"% de los datos. A continuación, se van a eliminar")
+
+MFinal <- unique(MFinal)
+
+cat("\n\nAhora, se tienen un total de ",nrow(MFinal)," observaciones (filas) con ",ncol(MFinal)," columnas")
+
+
+```
+Todavía se deben considerar aquellos datos que se encuentran fuera de los rangos establecidos en el diccionario, empezando por visualizar todas las variables y su tipo. Para esto, haremos uso de la librería dplyr.  
+
+```{r}
+library(dplyr)
+
+# Glimpse permite ver la cantidad de filas, columnas y también el tipo de dato 
+# de cada variable.
+glimpse(MFinal)
+```
+
+Por la naturaleza de los datos, se sabe que todos son de tipo entero. Sin embargo, se ve que la columna de 'year' se encuentra almacenada como dbl (numeric). A continuación, se cambiará esto: 
+
+```{r}
+MFinal$year <- as.integer(MFinal$year)
+```
+
+
+```{r}
+glimpse(MFinal)
+```
+Una vez corregido esto, con base en el descriptor de preguntas para la encuesta MOLEC, se identificarán aquellos datos con errores (valores fuera de los parámetros establecidos).
+Primero, se realizará un summary de los datos, para identificar los cuartiles y la media de los datos, identificar si existe algún valor que no cumpla con los requisitos del descriptor de preguntas, y finalmente eliminarlos. 
+
+```{r}
+summary(MFinal)
+```
+
+A continuación, se hará un desglose de cada variable y análisis de si cumple o no con los límites establecidos en la documentación de la encuesta. En caso de que no cumplan, se realizarán acciones con base en la significancia de los datos, asegurando mantener la calidad de los mismos. 
+
+sexo: los valores posibles son 1 o 2, lo cual se cumple ya que la variable es tipo entero y además el valor mínimo es 1 y el máximo es 2. 
+edad: se tienen valores enteros del 18 al 97, que corresponden a las edades de cada persona y se encuentran en los rangos realistas. 
+nivel: el nivel de escolaridad va de 0 a 9. No obstante, existe la opción de '99' para las personas que no saben su nivel de escolaridad. A continuación, se analizará más a profundidad esta variable: 
+
+```{r}
+nivelInvalido <- sum(MFinal$nivel >9)
+cat("La cantidad de datos que tienen un nivel inválido (mayor a 9) es de:",nivelInvalido,". Esto representa el ",(nivelInvalido/nrow(MFinal)*100),"% de los datos")
+```
+
+El porcentaje de datos que tienen un nivel inválido en la variable nivel es casi insignificante, por lo que se eliminarán estos datos. 
+
+```{r}
+MFinal <- MFinal[MFinal$nivel <= 9, ]
+```
+
+Se puede ver que ahora sí, la variable nivel cumple con los requerimientos establecidos en la documentación de la encuesta. 
+
+cond_act: esta variable tiene rangos de 1 a 10, con 99 tomando el valor de "no especificado" y 10 siendo "otra situación". Debido a la incertidumbre que generan ambas opciones, se evaluará la opción de eliminarlas: 
+
+```{r}
+igual10 <- sum(MFinal$cond_act>=10)
+cat("Se tiene un total de ",igual10," valores para la variable 'cond_act' que sean mayores o iguales a 10. Esto representa el ",(igual10/nrow(MFinal))*100,"% de los datos")
+
+mayor10 <- sum(MFinal$cond_act>10)
+cat("\n\nSe tiene un total de ",mayor10," valores para la variable 'cond_act' que sean mayores a 10. Esto representa el ",(mayor10/nrow(MFinal))*100,"% de los datos")
+```
+Ambas opciones representan un muy bajo porcentaje. Debido a que en total son 36 valores, se eliminarán todos para evitar ambigüedades y tener información con mayor precisión. 
+
+```{r}
+MFinal <- MFinal[MFinal$cond_act < 10,]
+```
+
+p3_1, p3_2, p3_5: las 3 preguntas toman valores únicamente de 1 y 2 según la documentación. Con base en summary(MFinal), se ve que el mínimo es 0 en todas y el máximo es 2. Estos espacios de 0 deberán ser eliminados ya que no cumplen con los límites de valores establecidos. 
+
+```{r}
+MFinal <- MFinal[MFinal$p3_1 >=1 & MFinal$p3_1 <=2,]
+MFinal <- MFinal[MFinal$p3_2 >=1 & MFinal$p3_2 <=2,]
+MFinal <- MFinal[MFinal$p3_5 >=1 & MFinal$p3_5 <=2,]
+
+cat("Después de la eliminación de este grupo de datos inválidos, se tiene un total de ",nrow(MFinal)," filas y ",ncol(MFinal), " columnas.\n\n")
+```
+
+p5: esta pregunta tiene valores enteros desde 0 a 6, donde la opción de 6 es "otros", lo cual no tiene demasiada utilidad para este análisis por la incertidumbre de lo que esto pueda significar. La opción de 0 es exclusiva para aquellos que indican que no leyeron libros, por lo que para identificar qué datos de 0 son inválidos, se debe de revisar la cantidad de personas que mencionaron que sí leen libros. 
+
+```{r}
+leenLibrosYBlancos <- sum(MFinal$p3_1 == 1 & MFinal$p5 == 0)
+
+
+cat("La cantidad de observaciones que tienen la opción seleccionadada de que el encuestado lee libros y dejó en blanco la pregunta referente a qué tipo de libros lee es de:",leenLibrosYBlancos)
+```
+Esto indica que no hay datos incongruentes en este aspecto, por lo que los datos en blanco sí corresponden a gente que no lee libros y no se deben de realizar modificaciones posteriores. No obstante, se debe de considerar la opción de eliminar "Otros". 
+
+```{r}
+otherp5 <- sum(MFinal$p5 == 6)
+cat("La cantidad de personas que seleccionaron su motivo principal de lectura de libros como 'Otro' es de",otherp5, ", representando un porcentaje de ",(otherp5/nrow(MFinal))*100,"%. Debido a que es poco significativo, se eliminarán estos datos.")
+
+MFinal <- MFinal[MFinal$p5 <6,]
+```
+
+p6_1 - p6_5: estas preguntas referentes al tipo de contenido que se consumió en los libros es de tipo numérico y tiene restricción a 1, 2 o en blanco. De primera instancia, se validará que los datos tengan sentido: que las personas que indiquen que sí han leído libros, hayan marcado al menos 1 de las opciones de contenido. 
+
+```{r}
+preg6 <- sum(MFinal$p3_1 == 1 & (MFinal$p6_1 == 1 | MFinal$p6_2 == 1 | MFinal$p6_3 == 1 | MFinal$p6_4 == 1 | MFinal$p6_5 == 1))
+bookreaders <- sum(MFinal$p3_1 == 1, na.rm = TRUE)
+cat("Personas que marcaron que leían libros:",bookreaders,"\n")
+cat("Personas que marcaron al menos un tipo de contenido:", preg6, "\n")
+```
+Se puede ver una discrepancia entre la cantidad de gente que marcó que leía libros y las personas que indicaron qué tipo de contenido leían. Por ello, se eliminará a todas esas personas que marcaron que leían libros y no hayan seleccionado alguna de las opciones. 
+
+```{r}
+MFinal <- MFinal[!(MFinal$p3_1 == 1 & MFinal$p6_1 != 1 & 
+                   MFinal$p6_2 != 1 & MFinal$p6_3 != 1 & 
+                   MFinal$p6_4 != 1 & MFinal$p6_5 != 1), ]
+```
+
+Con esto se concluye el manejo de la pregunta 6, y se avanzará a la pregunta 11. 
+
+p11: es un dato que va de 1 a 6, con espacios blancos cuando no se leen revistas y el valor de 6 se toma cuando se busca dar una opción no disponible dentro de las predeterminadas. Con esto en consideración, se analizará la congruencia entre las personas que votaron que leen revistas y que hayan seleccionado algún motivo. 
+
+```{r}
+leenRevistasNoDetalles <- sum(MFinal$p3_2 == 1 & MFinal$p11 == 0)
+cat("La cantidad de personas que indicaron que leen revistas pero no seleccionaron algún motivo de lectura es de:",leenRevistasNoDetalles)
+
+leenRevistasOtro <- sum(MFinal$p3_2 == 1 & (MFinal$p11 ==6))
+cat("\nLa cantidad de personas que indicaron que leen revistas pero su motivo principal no era una opción disponible es de",leenRevistasOtro, ", lo que representa un ",(leenRevistasOtro/nrow(MFinal))*100,"%. Al ser poco significativo, se optará por eliminar estos datos")
+
+MFinal <- MFinal[MFinal$p11 < 6,]
+```
+Esto indica que no se deberá de eliminar información ya que todas las razones de lectura de revistas se engloban en las 5 opciones disponibles, así como también se decidió eliminar a las 6 personas que no seleccionaron una opción disponible. 
+
+p12_1 - p12_8: este rango de valores pregunta por los contenidos de interés en las revistas y toma valores de 1 y 2 respectivamente, o blancos si no es de interés. 
+
+Primero, considerando el volumen de datos (en total son 8 opciones distintas), se optó por juntar en grupos significativos a las variables, creando tres categorías diferentes alineándose a la relación que existe entre los contenidos de lectura de revistas: 
+
+1. Revistas informativas (p12_2, p12_6, p12_7). Se guardarán en una columna llamada p12_info
+2. Revistas prácticas (p12_3, p12_4). Se guardarán en una columna llamada p12_prac
+3. Revistas de entretenimiento (p12_1, p12_5, p12_8). Se guardarán en una columna llamada p12_entr. 
+
+```{r}
+# 1. Revistas informativas (política, científica, cultura general)
+MFinal$p12_info <- ifelse(MFinal$p12_2 == 1 | MFinal$p12_6 == 1 | MFinal$p12_7 == 1, 1, 2)
+
+# 2. Revistas prácticas (didáctica, bienestar/salud)
+MFinal$p12_prac <- ifelse(MFinal$p12_3 == 1 | MFinal$p12_4 == 1, 1, 2)
+
+# 3. Revistas de entretenimiento (deportes, religiosas, entretenimiento)
+MFinal$p12_entr <- ifelse(MFinal$p12_1 == 1 | MFinal$p12_5 == 1 | MFinal$p12_8 == 1, 1, 2)
+
+# Eliminar columnas p12_4 a p12_8
+MFinal <- MFinal[, !names(MFinal) %in% c("p12_1", "p12_2", "p12_3", "p12_4", "p12_5", "p12_6", "p12_7", "p12_8")]
+
+```
+
+Ahora, la base de datos tiene únicamente 20 variables. Como última parte de filtrado y análisis de la pregunta 12, se identificarán incongruencias en los datos, donde el encuestado haya indicado que lee revistas, pero no haya marcado alguna de las opciones que se encuentra en las columnas p12_info, p12_prac o p12_entr
+
+```{r}
+incong <- sum(MFinal$p3_2 == 1 & (MFinal$p12_entr != 1 & MFinal$p12_info != 1 & MFinal$p12_prac != 1))
+cat("La cantidad de personas que indicaron que leen revistas pero no seleccionaron ninguna de las opciones de contenido de interés es de",incong)
+```
+
+Dadas estas incongruencias, se eliminarán esos datos: 
+```{r}
+MFinal <- MFinal[!(MFinal$p3_2 == 1 & MFinal$p12_entr != 1 & MFinal$p12_info != 1 &      MFinal$p12_prac != 1), ]
+```
+
+p25: esta variable numérica toma valores de 1 a 6, donde existe la opción de pase en blanco (si la persona encuestada no lee páginas de internet), y además la opción 6 existe como un "otro". A continuación se considerará el porcentaje de "Otro" que existe en esta pregunta y posteriormente se considerará también la cantida de datos incongruentes. Es decir, aquellos datos vacíos en personas encuestadas que hayan indicado que sí leían páginas web. 
+
+```{r}
+option6 <- sum(MFinal$p25 == 6)
+cat("La cantidad de personas que leen páginas de internet por otras razones a las mencionadas en la encuesta es de",option6, "lo que representa un ",(option6/nrow(MFinal))*100, "% de los datos")
+```
+Como representa menos de 1%, se eliminará esta opción. 
+
+```{r}
+MFinal <- MFinal[MFinal$p25 < 6,]
+```
+
+Finalmente, se considerarán los datos incongruentes: aquellos espacios en blanco de personas que sí leen revistas. 
+
+```{r}
+leenForoBlank <- sum(MFinal$p3_5 == 1 & MFinal$p25 == 0)
+cat("La cantidad de datos que indican que sí se leen foros en internet pero dejaron en blanco los motivos principales para visitar estas páginas es de:",leenForoBlank, " lo que representa un",(leenForoBlank/nrow(MFinal))*100, "% de los datos")
+```
+
+Como no existen inconsistencias para esta pregunta, se continúa trabajando con la última. 
+
+p35: variable numérica que solo toma los valores 1 y 2 ya que indica si el encuestado asistió a la primaria. Esta variable es importante, por lo que primero se analizará el porcentaje de espacios vacíos y después se evaluará la opción de eliminar todos esos datos. 
+
+```{r}
+blanksPrimaria <- sum(MFinal$p35 == 0)
+cat("La cantidad de gente que dejó en blanco la opción de si habían asistido a una primaria durante su infancia es de",blanksPrimaria, "representando el ",(blanksPrimaria/nrow(MFinal))*100, "% de los datos")
+```
+
+Al no haber datos blancos, se pude dejar la variable así. 
+
+Finalmente, para facilitar el manejo de información referente al nivel de educación de cada persona de la encuesta, así como para mejorar la visualización de datos, se agruparán los distintos niveles de educación conforme a los siguientes criterios: 
+
+- Sin educación: Se juntarán a las personas que marcaron que no tienen estudios o solo estudios de preescolar. 
+- Educación Básica y Media Básica: Se juntarán a las personas que marcaron que su nivel máximo de estudios es de primaria o secundaria
+- Educación Media Superior: Las personas que marcaron que su máximo nivel de estudios es bachillerato
+- Educación Superior: Aquellas personas que marcaron que su nivel máximo de educación fue licenciatura, escuela normal básica o carrera técnica
+- Posgrado: Aquellas personas que marcaron que su nivel máximo de educación fue una maestría o doctorado. 
+
+```{r}
+MFinal$niveles2 <- ifelse(MFinal$nivel %in% c(0, 1), 1,
+                     ifelse(MFinal$nivel %in% c(2, 3), 2,
+                     ifelse(MFinal$nivel == 4, 3,
+                     ifelse(MFinal$nivel %in% c(5, 6, 7), 4,
+                     ifelse(MFinal$nivel %in% c(8, 9), 5, NA)))))
+
+MFinal$nivel <- MFinal$niveles2
+
+MFinal <- MFinal[, !names(MFinal) %in% "niveles2"]
+
+```
+
+Con esto, se tienen 5 categorías que cada una engloba mayor cantidad de niveles educativos.
+
+Con la base ya trabajada, analizada y evaluada para identificar valores vacíos, duplicados e incongruencias, así como el manejo de muchas variables de forma organizada y acomodada para juntar con base en sus características (como el caso de las variables de la pregunta 12), logra resultar en una database suficiente, con mucha información y sobre todo una gran organización que permite encontrar información fiable para identificar tendencias. 
+
+```{r}
+cat("En total, se cuenta con ",nrow(MFinal), "filas y ",ncol(MFinal), "columnas en la base de datos\n\n")
+cat("Los nombres de las variables son\n")
+print(names(MFinal))
+cat("\n\n")
+
+cat("Donde las variables 'sexo', 'edad', 'nivel' y 'cond_act' son variables demográficas y las variables 'p3_1', 'p3_2', 'p3_5', 'p5', 'p6_1', 'p6_2', 'p6_3', 'p6_4', 'p6_5', 'p11', 'p25', 'p35', 'year', 'p12_info', 'p12_prac' y 'p12_entr' son variables sobre hábitos de lectura.")
+
+summary(MFinal)
+
+# escribimos un csv
+write.csv(MFinal, "DatosEquipo4.csv", row.names=FALSE)
+
+```
+
 
 
