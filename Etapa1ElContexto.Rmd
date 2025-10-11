@@ -1,6 +1,6 @@
 ---
 title: "Etapa1ElContexto"
-author: "Laurie Hernández"
+author: "Laurie Hernández, Emilio González, Hugo Gamboa, Jacqueline Peña, Pablo Robles"
 date: "2025-09-26"
 output: html_document
 ---
@@ -230,4 +230,5 @@ p35: asistencia a escuela primaria en la infancia. Permite relacionar el hábito
 La selección de estas variables gira en torno al objetivo central del análisis: estudiar la correlación entre el nivel educativo y el tipo de lectura así como su frecuencia. Por ello se mantienen las variables demográficas como nivel educativo y condición de actividad, pero también es importante considerar la frecuencia de la lectura, los motivos y el tipo de material que cada persona lee. 
 
 La inclusión de múltiples tipos de material (libros, revistas, medios digitales) es esencial porque permite identificar no solo si las personas leen más o menos en función de su escolaridad, sino también qué tipo de contenidos prefieren. Esto es relevante en el contexto actual, donde los hábitos de lectura han cambiado significativamente debido a la digitalización y el acceso a internet. 
+
 
