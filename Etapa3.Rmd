@@ -1,0 +1,291 @@
+---
+title: "Etapa3"
+author: "Hugo Edel Gamboa Sesma"
+date: "2025-10-17"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## R Markdown
+
+
+# Etapa 3: Análisis inferencial
+
+Tras analizar descriptivamente los datos obtenidos y refinar la pregunta de investigación, se determinó que el enfoque ideal de la investigación sería sobre el tipo de contenidos leídos, y no sobre la cantidad, ya que la disparidad en el tamaño de las muestras para cada nivel de estudios vuelve el estudio de cantidades irrelevante. 
+
+En su lugar, para esta etapa del análisis inferencial, se buscará inferir a partir de las proporciones de libros leídos por cada nivel de estudios en cada una de las categorías demarcadas anteriormente cuál sería esta proporción para la población
+
+inicialmente se carga la base de datos depurada
+```{r}
+df <- read.csv("DatosEquipo4.csv")
+
+```
+
+y posteriormente se crean subconjuntos de esta base de datos para cada año 
+
+```{r}
+df20 <- df[df$year == 2020,]
+df22<- df[df$year == 2022,]
+df24 <- df[df$year == 2024,]
+
+
+```
+
+A continuación se determinará que proporción de la muestra representa cada nivel de estudios, segun el código usado anteriormente:
+
+- Nivel 1: Sin educación: Se juntarán a las personas que marcaron que no tienen estudios o solo estudios de preescolar. 
+- Nivel 2: Educación Básica y Media Básica: Se juntarán a las personas que marcaron que su nivel máximo de estudios es de primaria o secundaria
+- Nivel 3: Educación Media Superior: Se incluirán únicamente a aquellos que hayan seleccionado su nivel máximo de estudios como de bachillerato
+- Nivel 4: Educación Superior: Se incluyen a aquellas personas que hayan seleccionado escuela normal, escuela técnica o licenciatura. 
+- Nivel 5: Posgrado: Se juntarán a aquellas personas que hayan seleccionado haber cursado una maestría o doctorado. 
+
+```{r}
+num_nivel1 =  length(df[df$nivel == 1,1])
+num_nivel2 =  length(df[df$nivel == 2,1])
+num_nivel3 =  length(df[df$nivel == 3,1])
+num_nivel4 =  length(df[df$nivel == 4,1])
+num_nivel5 =  length(df[df$nivel == 5,1])
+num_total = length(df[,1])
+prop_nivel1 = num_nivel1/num_total
+prop_nivel2 = num_nivel2/num_total
+prop_nivel3 = num_nivel3/num_total
+prop_nivel4 = num_nivel4/num_total
+prop_nivel5 = num_nivel1/num_total
+
+cat("Nivel 1 representa:", prop_nivel1*100, "% de la muestra\n","Nivel 2 representa:", prop_nivel2*100, "% de la muestra\n","Nivel 3 representa:", prop_nivel3*100, "% de la muestra\n","Nivel 4 representa:", prop_nivel4*100, "% de la muestra\n","Nivel 5 representa:", prop_nivel5*100, "% de la muestra")
+```
+También se pueden obtener proporciones para la lectura por tipo de materiales:
+
+Por tipo de fuente:
+```{r}
+prop_fuente1_si = length(df[df$p3_1==1,1]) / length(df[df$p3_1,1])
+prop_fuente1_no = 1-prop_fuente1_si
+
+prop_fuente2_si = length(df[df$p3_2==1,1]) / length(df[df$p3_2,1])
+prop_fuente2_no = 1-prop_fuente2_si
+
+prop_fuente3_si = length(df[df$p3_5==1,1]) / length(df[df$p3_5,1])
+prop_fuente3_no = 1-prop_fuente3_si
+
+
+cat("El", prop_fuente1_si*100, " % de los encuestados afirma leer libros, mientras que el", prop_fuente1_no*100, "afirma no leerlos.\n", "El", prop_fuente2_si*100, " % de los encuestados afirma leer revistas, mientras que el", prop_fuente2_no*100, "afirma no leerlas.\n", "El", prop_fuente3_si*100, " % de los encuestados afirma leer materiales digitales, mientras que el", prop_fuente3_no*100, "afirma no leerlos.\n")
+```
+
+A continuación, se realizará una prueba de hipótesis utilizando el test de $\chi^2$ para identificar si existe una diferencia de proporción entre el nivel de estudios con base en las categorías que se designaron con anterioridad y el tipo de contenido que leen las personas: Libros, Revistas y Medios digitales. 
+
+Se establece como hipótesis nula $H_0$ que las proporciones entre nivel y tipo de lectura son similares, mientras que de hipótesis alternativa $H_a$ queda en que las proporciones son distintas. 
+
+```{r}
+# cantidad de personas de cada nivel y el tipo de material que leen
+libn1 <- sum(df["p3_1"] == 1 & df["nivel"] == 1)
+libn2 <- sum(df["p3_1"] == 1 & df["nivel"] == 2)
+libn3 <- sum(df["p3_1"] == 1 & df["nivel"] == 3)
+libn4 <- sum(df["p3_1"] == 1 & df["nivel"] == 4)
+libn5 <- sum(df["p3_1"] == 1 & df["nivel"] == 5)
+rev1 <- sum(df["p3_2"] == 1 & df["nivel"] == 1)
+rev2 <- sum(df["p3_2"] == 1 & df["nivel"] == 2)
+rev3 <- sum(df["p3_2"] == 1 & df["nivel"] == 3)
+rev4 <- sum(df["p3_2"] == 1 & df["nivel"] == 4)
+rev5 <- sum(df["p3_2"] == 1 & df["nivel"] == 5)
+dig1 <- sum(df["p3_5"] == 1 & df["nivel"] == 1)
+dig2 <- sum(df["p3_5"] == 1 & df["nivel"] == 2)
+dig3 <- sum(df["p3_5"] == 1 & df["nivel"] == 3)
+dig4 <- sum(df["p3_5"] == 1 & df["nivel"] == 4)
+dig5 <- sum(df["p3_5"] == 1 & df["nivel"] == 5)
+
+# armamos la tabla de datos para realizar la prueba chi cuadrada. 
+datos <- matrix(c(libn1, libn2, libn3, libn4, libn5, libn1+libn2+libn3+libn4+libn5,rev1, rev2, rev3, rev4, rev5, rev1+rev2+rev3+rev4+rev5,dig1, dig2, dig3, dig4, dig5, dig1+dig2+dig3+dig4+dig5, libn1+rev1+dig1,libn2+rev2+dig2, libn3 + rev3+dig3, libn4 + rev4 + dig4, libn5 + rev5 + dig5, libn1+libn2+libn3+libn4+libn5+rev1+rev2+rev3+rev4+rev5+dig1+dig2+dig3+dig4+dig5), byrow = TRUE, nrow = 4, ncol = 6)
+rownames(datos) <- c("Libros","Revistas","Medios digitales","Total")
+colnames(datos) <- c("Nivel 1","Nivel 2", "Nivel 3", "Nivel 4", "Nivel 5", "Total")
+tablaNivelMaterialTotal <- as.table(datos)
+tablaNivelMaterialTotal
+
+# Finalmente acomodamos una tabla sin los totales para poder hacer la prueba chi
+
+tablaNivelMaterialNoTotal <- tablaNivelMaterialTotal[1:3, 1:5] 
+chisq.test(tablaNivelMaterialNoTotal)
+```
+
+Debido a que el valor p es de $4.922 \times 10^{-8}$, que es significativamente menor a $0.04$, se rechaza la hipótesis nula $H_0$ ya que existe evidencia estadística para inferir que las proporciones entre los niveles educativos y los tipos de texto (libros, revistas y medios digitales) son distintos. 
+
+A continuación, se elaborarán las tablas de contingencia para los tipos de contenidos dentro de la lectura. Previo a esto, se agruparán en tres categorías nuevas a los tipos de contenidos de libros. Inicialmente se tiene 5 categorías para los libros: 
+- Manuales
+- Académicos
+- Autoayuda
+- Literatura
+- Cultura general
+
+Para las nuevas categorías, se hará uso de los conceptos de las tres categorías que engloban los contenidos de revistas. La agrupación se hará de la siguiente manera: 
+
+Informativo: Cultura general, académico
+Practico: Manuales, Autoayuda
+Entretenimiento:Literatura
+
+Para esto, se reagruparán en nuevas columnas dentro de la base de datos. 
+
+```{r}
+# Agrupamos cada una de las variables. 
+df["p6_info"] <- ifelse(df["p6_5"] == 1 | df["p6_2"] == 1, 1, 2)
+df["p6_prac"] <- ifelse(df["p6_1"] == 1 | df["p6_3"] == 1, 1, 2)
+df["p6_entr"] <- ifelse(df["p6_4"] == 1, 1, 2)
+
+# Eliminamos las columnas no deseadas en el dataframe. 
+df <- df[, !names(df) %in% c("p6_1", "p6_2", "p6_3", "p6_4", "p6_5")]
+```
+
+Una vez agrupadas, se realizará la tabla de contingencia de nivel educativo con respecto al tipo de contenido que leen las personas para libros, revistas y medios digitales. Nuevamente, la hipótesis nula $H_0$ es que las distribuciones serían iguales entre cada nivel educativo, mientras que la hipótesis alternativa $H_a$ sería que las distribuciones fueran distintas. 
+
+```{r}
+libinfo1 <- sum(df["p6_info"] == 1 & df["nivel"] == 1)
+libinfo2 <- sum(df["p6_info"] == 1 & df["nivel"] == 2)
+libinfo3 <- sum(df["p6_info"] == 1 & df["nivel"] == 3)
+libinfo4 <- sum(df["p6_info"] == 1 & df["nivel"] == 4)
+libinfo5 <- sum(df["p6_info"] == 1 & df["nivel"] == 5)
+
+libinfo <- libinfo1 + libinfo2 + libinfo3 + libinfo4 +libinfo5
+
+libprac1 <- sum(df["p6_prac"] == 1 & df["nivel"] == 1)
+libprac2 <- sum(df["p6_prac"] == 1 & df["nivel"] == 2)
+libprac3 <- sum(df["p6_prac"] == 1 & df["nivel"] == 3)
+libprac4 <- sum(df["p6_prac"] == 1 & df["nivel"] == 4)
+libprac5 <- sum(df["p6_prac"] == 1 & df["nivel"] == 5)
+
+libprac <- libprac1 + libprac2 + libprac3 + libprac4 + libprac5
+
+libentr1 <- sum(df["p6_entr"] == 1 & df["nivel"] == 1)  
+libentr2 <- sum(df["p6_entr"] == 1 & df["nivel"] == 2) 
+libentr3 <- sum(df["p6_entr"] == 1 & df["nivel"] == 3)  
+libentr4 <- sum(df["p6_entr"] == 1 & df["nivel"] == 4)  
+libentr5 <- sum(df["p6_entr"] == 1 & df["nivel"] == 5)  
+
+libentr <- libentr1 + libentr2 + libentr3 + libentr4 + libentr5
+
+datos <- matrix(c(libinfo1, libinfo2, libinfo3, libinfo4, libinfo5, libinfo1 + libinfo2 + libinfo3 + libinfo4 + libinfo5, libprac1, libprac2, libprac3, libprac4, libprac5, libprac1+libprac2+libprac3+libprac4+libprac5, libentr1, libentr2, libentr3, libentr4, libentr5, libentr1+libentr2+libentr3+libentr4+libentr5, libinfo1 + libprac1 + libentr1, libinfo2 + libprac2 + libentr2, libinfo3 + libprac3 + libentr3, libinfo4 + libprac4 + libentr4, libinfo5 + libprac5 + libentr5,  libinfo1+libinfo2+libinfo3+libinfo4+libinfo5+libprac1+libprac2+libprac3+libprac4+libprac5+ libentr1+libentr2+libentr3+libentr4+libentr5), nrow = 4, ncol = 6, byrow = TRUE)  
+
+rownames(datos) <- c("Informativos","Prácticos","Entretenimiento", "Total")
+colnames(datos) <- c("Nivel 1", "Nivel 2", "Nivel 3", "Nivel 4", "Nivel 5", "Total")
+
+
+tablaTiposLibros <- as.table(datos)
+tablaTiposLibros
+
+tablaTiposLibrosNoTotal <- tablaTiposLibros[1:3, 1:5]
+```
+Tabla para revistas
+
+```{r}
+# Variables para Revistas Informativas por nivel
+revinfo1 <- sum(df["p12_info"] == 1 & df["nivel"] == 1)
+revinfo2 <- sum(df["p12_info"] == 1 & df["nivel"] == 2)
+revinfo3 <- sum(df["p12_info"] == 1 & df["nivel"] == 3)
+revinfo4 <- sum(df["p12_info"] == 1 & df["nivel"] == 4)
+revinfo5 <- sum(df["p12_info"] == 1 & df["nivel"] == 5)
+
+revinfo <- revinfo1 + revinfo2 + revinfo3 + revinfo4 + revinfo5
+
+# Variables para Revistas Prácticas por nivel
+revprac1 <- sum(df["p12_prac"] == 1 & df["nivel"] == 1)
+revprac2 <- sum(df["p12_prac"] == 1 & df["nivel"] == 2)
+revprac3 <- sum(df["p12_prac"] == 1 & df["nivel"] == 3)
+revprac4 <- sum(df["p12_prac"] == 1 & df["nivel"] == 4)
+revprac5 <- sum(df["p12_prac"] == 1 & df["nivel"] == 5)
+
+revprac <- revprac1 + revprac2+ revprac3 + revprac4 +revprac5
+
+# Variables para Revistas de Entretenimiento por nivel
+reventr1 <- sum(df["p12_entr"] == 1 & df["nivel"] == 1)
+reventr2 <- sum(df["p12_entr"] == 1 & df["nivel"] == 2)
+reventr3 <- sum(df["p12_entr"] == 1 & df["nivel"] == 3)
+reventr4 <- sum(df["p12_entr"] == 1 & df["nivel"] == 4)
+reventr5 <- sum(df["p12_entr"] == 1 & df["nivel"] == 5)
+
+reventr <- reventr1 + reventr2 + reventr3 + reventr4 + reventr5
+
+# Crear matriz con el mismo formato
+datos_revistas <- matrix(c(
+  revinfo1, revinfo2, revinfo3, revinfo4, revinfo5, revinfo1 + revinfo2 + revinfo3 + revinfo4 + revinfo5,
+  revprac1, revprac2, revprac3, revprac4, revprac5, revprac1 + revprac2 + revprac3 + revprac4 + revprac5,
+  reventr1, reventr2, reventr3, reventr4, reventr5, reventr1 + reventr2 + reventr3 + reventr4 + reventr5,
+  revinfo1 + revprac1 + reventr1, 
+  revinfo2 + revprac2 + reventr2, 
+  revinfo3 + revprac3 + reventr3, 
+  revinfo4 + revprac4 + reventr4, 
+  revinfo5 + revprac5 + reventr5,
+  revinfo1 + revinfo2 + revinfo3 + revinfo4 + revinfo5 + 
+    revprac1 + revprac2 + revprac3 + revprac4 + revprac5 + 
+    reventr1 + reventr2 + reventr3 + reventr4 + reventr5
+), nrow = 4, ncol = 6, byrow = TRUE)
+
+rownames(datos_revistas) <- c("Informativos", "Prácticos", "Entretenimiento", "Total")
+colnames(datos_revistas) <- c("Nivel 1", "Nivel 2", "Nivel 3", "Nivel 4", "Nivel 5", "Total")
+
+tablaTiposRevistas <- as.table(datos_revistas)
+tablaTiposRevistas
+
+tablaTiposRevistasNoTotal <- tablaTiposRevistas[1:3, 1:5]
+
+```
+En la encuesta MOLEC no se recopiló información sobre los tipos de contenidos que consumen las personas que leen de manera digital, por lo que para su análisis estadístico, los medios digitales serán descontados. 
+
+Contando con esta información en las tablas de contingencia, se puede visualizar que existen casos en el Nivel 1 específicamente donde no se cuenta con valores, es decir, se tienen 0s. Esto limita el uso de herramientas estadísticas para realizar alguna prueba de hipótesis como el chi-cuadrado. Es por ello que se realizó una investigación exhaustiva de distintos métodos para poder relacionar variables categóricas como lo son el nivel y tipo de contenido que se lee. 
+
+## Regresión logística binomial
+
+La regresión logística binomial es un modelo que busca explicar la relación entre una variable dependiente binaria y una variable independiente que puede ser categórica. Este modelo permite cuantificar la relación existente entre las variables independientes y las posibles dependientes. 
+
+```{r}
+# guardamos las variables de forma binaria para que se pueda hacer la regresión logística binomial
+
+df$p6_info_bin <- ifelse(df$p6_info == 1, 1, 0)
+df$p6_prac_bin <- ifelse(df$p6_prac == 1, 1, 0)
+df$p6_entr_bin <- ifelse(df$p6_entr == 1, 1, 0)
+df$p12_info_bin <- ifelse(df$p12_info == 1, 1, 0)
+df$p12_prac_bin <- ifelse(df$p12_prac == 1, 1, 0)
+df$p12_entr_bin <- ifelse(df$p12_entr == 1, 1, 0)
+
+# Crear variable lector (lee libros, revistas o digital)
+df$lector <- ifelse(df$p3_1 == 1 | df$p3_2 == 1 | df$p3_5 == 1, 1, 0)
+```
+
+```{r}
+
+# creamos un modelo para cada pregunta y variable: 
+modelo_info_libros <- glm(p6_info_bin ~ nivel, data = df, family = binomial)
+modelo_prac_libros <- glm(p6_prac_bin ~ nivel, data = df, family = binomial)
+modelo_entr_libros <- glm(p6_entr_bin ~ nivel, data = df, family = binomial)
+modelo_info_revistas <- glm(p12_info_bin ~ nivel, data = df, family = binomial)
+modelo_prac_revistas <- glm(p12_prac_bin ~ nivel, data = df, family = binomial)
+modelo_entr_revistas <- glm(p12_entr_bin ~ nivel, data = df, family = binomial)
+
+# recuperamos el coeficiente de cada modelo para calcular su odds ratio
+
+coef_info_libros <- coef(modelo_info_libros)["nivel"]
+odds_info_libros <- exp(coef_info_libros)
+
+coef_prac_libros <- coef(modelo_prac_libros)["nivel"]
+odds_prac_libros <- exp(coef_prac_libros)
+
+coef_entr_libros <- coef(modelo_entr_libros)["nivel"]
+odds_entr_libros <- exp(coef_entr_libros)
+
+coef_info_revistas <- coef(modelo_info_revistas)["nivel"]
+odds_info_revistas <- exp(coef_info_revistas)
+
+coef_prac_revistas <- coef(modelo_prac_revistas)["nivel"]
+odds_prac_revistas <- exp(coef_prac_revistas)
+
+coef_entr_revistas <- coef(modelo_entr_revistas)["nivel"]
+odds_entr_revistas <- exp(coef_entr_revistas)
+
+cat("Resultados de coeficientes y Odds Ratio (OR) para cada modelo:\n")
+cat("Libros informativos - Coef:", coef_info_libros, ". OR:", odds_info_libros, "\n")
+cat("Libros prácticos - Coef:", coef_prac_libros, ". OR:", odds_prac_libros, "\n")
+cat("Libros entretenimiento - Coef:", coef_entr_libros, ". OR:", odds_entr_libros, "\n")
+cat("Revistas informativas - Coef:", coef_info_revistas, ". OR:", odds_info_revistas, "\n")
+cat("Revistas prácticas - Coef:", coef_prac_revistas, ". OR:", odds_prac_revistas, "\n")
+cat("Revistas entretenimiento - Coef:", coef_entr_revistas, ". OR:", odds_entr_revistas, "\n")
+```
+
