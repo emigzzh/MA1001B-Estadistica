@@ -1,4 +1,4 @@
-# Reto: Modelación Estadística para la Toma de Decisiones 📊
+# Reto: Modelación Estadística para la Toma de Decisiones
 
 Proyecto realizado como parte de la materia **Modelación Estadística para la Toma de Decisiones**  
 Semestre **Agosto–Diciembre 2025**
