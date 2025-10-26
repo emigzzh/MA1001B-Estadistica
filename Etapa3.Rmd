@@ -1,7 +1,7 @@
 ---
 title: "Etapa3"
-author: "Hugo Edel Gamboa Sesma"
-date: "2025-10-17"
+author: "Equipo 4"
+date: "2025-10-25"
 output: word_document
 ---
 
@@ -338,4 +338,5 @@ tabla_lib
 tabla_rev
 tabla_dig
 ```
+
 
