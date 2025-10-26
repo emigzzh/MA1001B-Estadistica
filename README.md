@@ -24,7 +24,7 @@ El análisis se llevó a cabo en **R**, utilizando técnicas como:
 - Modelos de **regresión logística** (binomial y multinomial) para exploración predictiva.
 
 ---
-
+```
 ## Estructura del proyecto
 📁 Reto-Modelacion-Estadistica/
 ├── data/ # Bases de datos (MOLEC y derivadas)
@@ -36,7 +36,7 @@ El análisis se llevó a cabo en **R**, utilizando técnicas como:
 ├── reporte/
 │ └── Reto_Final.pdf # Reporte final con resultados
 └── README.md # Este archivo
-
+```
 ---
 
 ## Requisitos
