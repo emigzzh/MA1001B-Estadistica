@@ -1,6 +1,6 @@
 ---
-title: "¿Existe alguna relación entre el nivel de escolaridad y la lectura de la población en México, así como con el tipo de contenidos que leen?"
-author: "Laurie Hernández"
+title: "Etapa 1. El contexto"
+author: "Equipo 4"
 date: "2025-09-26"
 output: html_document
 ---
@@ -10,6 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Etapa 1. El contexto y el objetivo
+Recordamos que la pregunta detonadora de la actividad es: "¿Existe una relación significativa entre el nivel educativo de las personas y sus preferencias en cuanto al tipo de contenido leído?"
+Esta pregunta debe ser recordada a lo largo de todo el análisis. 
 
 ## Lectura de las bases de datos
 
@@ -479,4 +481,5 @@ summary(MFinal)
 write.csv(MFinal, "DatosEquipo4.csv", row.names=FALSE)
 
 ```
+
 
