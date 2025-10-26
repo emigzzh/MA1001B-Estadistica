@@ -29,10 +29,9 @@ El análisis se llevó a cabo en **R**, utilizando técnicas como:
 📁 Reto-Modelacion-Estadistica/
 ├── data/ # Bases de datos (MOLEC y derivadas)
 ├── scripts/ # Código en R (.R)
-│ ├── limpieza_datos.R
-│ ├── analisis_descriptivo.R
-│ ├── pruebas_inferenciales.R
-│ └── regresiones_logisticas.R
+│ ├── Etapa1ElContexto.Rmd
+│ ├── Etapa2Pt2.Rmd
+│ └── Etapa3.Rmd
 ├── reporte/
 │ └── Reto_Final.pdf # Reporte final con resultados
 └── README.md # Este archivo
