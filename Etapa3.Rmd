@@ -1,7 +1,7 @@
 ---
 title: "Etapa3"
-author: "Hugo Edel Gamboa Sesma"
-date: "2025-10-17"
+author: "Equipo 4"
+date: "2025-10-25"
 output: word_document
 ---
 
@@ -288,4 +288,55 @@ cat("Revistas informativas - Coef:", coef_info_revistas, ". OR:", odds_info_revi
 cat("Revistas prácticas - Coef:", coef_prac_revistas, ". OR:", odds_prac_revistas, "\n")
 cat("Revistas entretenimiento - Coef:", coef_entr_revistas, ". OR:", odds_entr_revistas, "\n")
 ```
+Finalmente, se realiza la prueba de hipótesis, recuperando el valor p de cada uno de los modelos y comparandolo con $\alpha$: 
+
+```{r}
+
+p_info_libros <- summary(modelo_info_libros)$coefficients["nivel", "Pr(>|z|)"]
+p_prac_libros <- summary(modelo_prac_libros)$coefficients["nivel", "Pr(>|z|)"]
+p_entr_libros <- summary(modelo_entr_libros)$coefficients["nivel", "Pr(>|z|)"]
+p_info_revistas <- summary(modelo_info_revistas)$coefficients["nivel", "Pr(>|z|)"]
+p_prac_revistas <- summary(modelo_prac_revistas)$coefficients["nivel", "Pr(>|z|)"]
+p_entr_revistas <- summary(modelo_entr_revistas)$coefficients["nivel", "Pr(>|z|)"]
+
+
+cat("Valor p para cada modelo:\n")
+cat("Libros informativos:", p_info_libros, ". Se rechaza Ho.\n")
+cat("Libros prácticos:", p_prac_libros, ". No se rechaza Ho.\n")
+cat("Libros entretenimiento:", p_entr_libros, ". Se rechaza Ho.\n")
+cat("Revistas informativas:", p_info_revistas, ". Se rechaza Ho.\n")
+cat("Revistas prácticas:", p_prac_revistas, ". Se rechaza Ho.\n")
+cat("Revistas entretenimiento:", p_entr_revistas, ". Se rechaza Ho.\n")
+```
+
+## Prueba de Fisher
+
+Se realizó posteriormente una prueba de hipótesis de Fisher para ver si había dependencia entre el nivel educativo de las personas y el motivo de lectura. Se usa prueba de Fisher porque las frecuencias son bajas en algunos subconjuntos, y si bien las tablas son de dimensiones grandes, se puede usar una simulación de Monte Carlo para estimar el valor p. 
+
+```{r}
+# Filtramos las filas de gente que no lee libros frecuentemente (los 0s)
+df <- df[df$p5 != 0, ]
+df <- df[df$p11 != 0, ]
+df <- df[df$p25 != 0, ]
+
+df$nivel <- (df$nivel)
+df$p5 <- as.factor(df$p5)
+df$p11 <- as.factor(df$p11)
+df$p25 <- as.factor(df$p25)
+
+levels(df$nivel) <- c("Nivel 1", "Nivel 2", "Nivel 3", "Nivel 4", "Nivel 5")
+levels(df$p5) <- c("Trabajo", "Estudio", "Cultura general", "Entretenimiento","Religión")
+levels(df$p11) <- c("Trabajo", "Estudio", "Cultura general", "Entretenimiento","Religión")
+levels(df$p25) <- c("Trabajo", "Estudio", "Cultura general", "Entretenimiento","Religión")
+ 
+# Tablas
+tabla_lib <- table(df$nivel, df$p5)
+tabla_rev <- table(df$nivel, df$p11)
+tabla_dig <- table(df$nivel, df$p25)
+
+tabla_lib
+tabla_rev
+tabla_dig
+```
+
 

@@ -1,6 +1,6 @@
 ---
-title: "Etapa1ElContexto"
-author: "Laurie Hernández, Emilio González, Hugo Gamboa, Jacqueline Peña, Pablo Robles"
+title: "¿Existe alguna relación entre el nivel de escolaridad y la lectura de la población en México, así como con el tipo de contenidos que leen?"
+author: "Laurie Hernández"
 date: "2025-09-26"
 output: html_document
 ---
@@ -479,6 +479,4 @@ summary(MFinal)
 write.csv(MFinal, "DatosEquipo4.csv", row.names=FALSE)
 
 ```
-
-
 

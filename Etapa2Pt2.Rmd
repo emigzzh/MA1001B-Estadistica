@@ -1,24 +1,12 @@
 ---
 title: 'Etapa 2 Parte 2: Gráficos'
-author: "Laurie Hernández, Emilio González, Hugo Gamboa, Jacqueline Peña, Pablo Robles"
+author: "Laurie Hernández"
 date: "2025-10-10"
-output:
-  word_document: default
-  html_document: default
-  pdf_document: default
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(
-  echo = FALSE,
-  fig.width = 10,
-  fig.height = 6,
-  dpi = 300,
-  out.width = "80%",  # escala dentro del documento
-  fig.align = "center"
-  )
-
-
+knitr::opts_chunk$set(echo = TRUE)
 ```
  
 # Etapa 2. Comprensión y preparación de datos
@@ -68,8 +56,6 @@ Para las medidas de forma (sesgo y curtosis), se hará uso de...
 
 Primero, se carga el archivo .csv creado en el Rmd anterior: 
 ```{r}
-library(moments)
-library(ggplot2)
 df <- read.csv("DatosEquipo4.csv")
 ```
 
@@ -78,9 +64,10 @@ df <- read.csv("DatosEquipo4.csv")
 Considerando la naturaleza de cada una de las variables, se deben de realizar distintos análisis, así como tratar a cada tipo de dato de una manera distinta. De primera instancia, es importante considerar que las variables 'edad' y 'nivel' son aquellas que, al ser discretas numéricas, se puede identificar sus medidas estadísticas básicas. 
 
 #### Edad
-La variable de edad representa los años que tiene cada uno de los encuestados. A continuación se realiza un análisis cuantitativo de esta variable. 
+La variable de edad representa los años que tiene cada uno de los encuestados. A contiuación se realiza un análisis cuantitativo de esta variable. 
 
 ```{r}
+library(moments)
 df20 <- df[df$year == 2020,]
 df22 <- df[df$year == 2022,]
 df24 <- df[df$year == 2024,]
@@ -141,25 +128,25 @@ Además, se incluyen histogramas para visualizar la información de mejor manera
 ```{r}
 par(mfrow = c(2, 2))  # 2 filas, 2 columnas
 hist(df20$edad,
-     main = "Distribución de edades\n 2020",
+     main = "Distribución de edades - 2020",
      xlab = "Edad",
      col = "lightgreen",
      border = "white")
 
 hist(df22$edad,
-     main = "Distribución de edades\n 2022",
+     main = "Distribución de edades - 2022",
      xlab = "Edad",
      col = "lightblue",
      border = "white")
 
 hist(df24$edad,
-     main = "Distribución de edades\n 2024",
+     main = "Distribución de edades - 2024",
      xlab = "Edad",
      col = "lightpink",
      border = "white")
 
 hist(df$edad,
-     main = "Distribución de edades\n Total",
+     main = "Distribución de edades - Total",
      xlab = "Edad",
      col = "tomato",
      border = "white")
@@ -173,35 +160,6 @@ Con respecto al sesgo, se identifica uno de 0.33 para todo el conjunto de datos,
 Finalmente, la curtosis del total de datos al ser $2.23 < 3.00$, indica que hay una distribución más plana que la distribución normal, por lo que las edades se encuentran menos concentradas en el rango de la media. 
 
 Conocer esto sobre la edad de los participantes de la encuesta permite identificar oportunidades en la recolección de datos. De primera instancia, la muestra heterogénea permite analizar las distintas generaciones, además de que los datos no cambian tanto con respecto a los años: no se ve un aumento significativo en la edad de los participantes de la encuesta.  
-
-##### Categorización de nivel
-
-La variable 'nivel' también corresponde a distintas categorías de niveles educativos. Por cuestiones de volumen de datos, así como para eficientar el análisis se categorizarán los distintos niveles de educación con los siguientes criterios: 
-
-- Sin educación: Se juntarán a las personas que marcaron que no tienen estudios o solo estudios de preescolar. 
-- Educación Básica y Media Básica: Se juntarán a las personas que marcaron que su nivel máximo de estudios es de primaria o secundaria
-- Educación Media Superior: Se incluirán únicamente a aquellos que hayan seleccionado su nivel máximo de estudios como de bachillerato
-- Educación Superior: Se incluyen a aquellas personas que hayan seleccionado escuela normal, escuela técnica o licenciatura. 
-- Posgrado: Se juntarán a aquellas personas que hayan seleccionado haber cursado una maestría o doctorado. 
-
-Con esta clasificación en mente, se muestra a continuación un gráfico de pay considerando el total de personas en toda la encuesta y su nivel educativo
-
-
-```{r}
-niveles_counts <- table(factor(df$nivel, levels = 1:5))
-labels <- c("Sin educación", "Educación básica y media básica", "Educación media superior", "Educación superior", "Posgrado")
-names(niveles_counts) <- labels
-  
-pie(niveles_counts,
-    main = "Nivel de educación de los encuestados",
-    col = c("lightblue","lightgreen","gold","lightpink","violet"),
-    labels = paste0(round(100 * niveles_counts / sum(niveles_counts), 1), "%"),
-    cex = 0.8,      # tamaño del texto
-    radius = 1)   # agranda el radio del gráfico
-legend("topleft", legend = labels, fill = c("lightblue","lightgreen","gold","lightpink","violet"), cex=0.9)
-
-
-```
 
 #### Nivel
 
@@ -258,7 +216,7 @@ row.names(m) <- c("Minimo","Q1","Mediana","Media","Q3","Máximo","Rango Medio", 
 round(m,2)
 ```
 
-Los estadísticos indican que en los tres años existen niveles similares de educación: la mediana se mantiene en 3 para los tres años y en general, así como los mínimos, cuartiles inferior, superior y el valor máximo. Además, el valor de la desviación estándar gira en torno a $\sigma = 0.9667$ en general entre los tres años, esto indica que los datos no se dispersan tanto entre si. Además, el sesgo varía ligeramente de los dos primeros años al último, pasando de 0.08 a -0.05, lo que indica que la mayoría de la muestra pasó de  estar ligeramente concentrada sobre la cola la derecha a estar ligeramente concentrado sobre la cola izquierda. Finalmente, la curtosis se encuentra en 1.74 para todos los datos, lo que indica que el gráfico se puede ver significativamente más "achatado".
+Los estadísticos indican que en los tres años existen niveles similares de educación: la mediana se mantiene en 4 para los tres años y en general, así como los mínimos, cuartiles inferior, superior y el valor máximo. Además, el valor de la desviación estándar gira en torno a $\sigma = 2.05$ en general entre los tres años, esto indica que los datos no se dispersan tanto entre si. Además, el sesgo se encuentra en total en todos los datos en 0.10, lo que indica que los datos se concentran ligeramente en la cola izquierda. Finalmente, la curtosis se encuentra en 1.68 para todos los datos, lo que indica que el gráfico se puede ver significativamente más "achatado".
 
 A continuación se muestran gráficos de caja y bigote para los datos: 
 
@@ -272,7 +230,34 @@ boxplot(df20$nivel, df22$nivel, df24$nivel, df$nivel,
 
 Se puede ver mediante las cajas que los datos se mantienen constantes a lo largo de los años. Esto permite asegurar que la información utilizada sí es representativa de lo que se quiere agrupar, que es la población mexicana. 
 
+##### Categorización de nivel
 
+La variable 'nivel' también corresponde a distintas categorías de niveles educativos. Por cuestiones de volumen de datos, así como para eficientar el análisis se categorizarán los distintos niveles de educación con los siguientes criterios: 
+
+- Sin educación: Se juntarán a las personas que marcaron que no tienen estudios o solo estudios de preescolar. 
+- Educación Básica y Media Básica: Se juntarán a las personas que marcaron que su nivel máximo de estudios es de primaria o secundaria
+- Educación Media Superior: Se incluirán únicamente a aquellos que hayan seleccionado su nivel máximo de estudios como de bachillerato
+- Educación Superior: Se incluyen a aquellas personas que hayan seleccionado escuela normal, escuela técnica o licenciatura. 
+- Posgrado: Se juntarán a aquellas personas que hayan seleccionado haber cursado una maestría o doctorado. 
+
+Con esta clasificación en mente, se muestra a continuación un gráfico de pay considerando el total de personas en toda la encuesta y su nivel educativo
+
+
+```{r}
+niveles_counts <- table(factor(df$nivel, levels = 1:5))
+labels <- c("Sin educación", "Educación básica y media básica", "Educación media superior", "Educación superior", "Posgrado")
+names(niveles_counts) <- labels
+  
+pie(niveles_counts,
+    main = "Nivel de educación de los encuestados",
+    col = c("lightblue","lightgreen","gold","lightpink","violet"),
+    labels = paste0(round(100 * niveles_counts / sum(niveles_counts), 1), "%"),
+    cex = 0.8,      # tamaño del texto
+    radius = 1)   # agranda el radio del gráfico
+legend("topleft", legend = labels, fill = c("lightblue","lightgreen","gold","lightpink","violet"), cex=0.6)
+
+
+```
 
 
 ### Análisis de variables binarias
@@ -284,31 +269,35 @@ En la base de datos, existen una gran cantidad de variables que solamente deben 
 A continuación, se muestran gráficos de barras referentes a la pregunta 3, que buscan conocer si el encuestado ha leído libros, revistas o páginas en internet. 
 
 ```{r}
-# creamos una función para graficar con base en un dataframe, los datos de un año
-plot_p3 <- function(df, year) {
-  counts <- rbind(
-    table(df$p3_1),
-    table(df$p3_2),
-    table(df$p3_5))
+
+plot_p3_prop <- function(df, year) {
+  # Calcular proporciones en lugar de frecuencias
+  props <- rbind(
+    prop.table(table(df$p3_1)),
+    prop.table(table(df$p3_2)),
+    prop.table(table(df$p3_5)))
   
-  rownames(counts) <- c("Libros", "Revistas", "Online")
-  barplot(t(counts),
+  rownames(props) <- c("Libros", "Revistas", "Online")
+  
+  barplot(t(props),
           beside = TRUE,
           col = c("lightgreen", "tomato"),
-          main = paste("Lectura por \ntipo de fuente ", year),
-          ylab = "Frecuencia",
-          names.arg = rownames(counts),
+          main = paste("Lectura por tipo de fuente -", year),
+          ylab = "Proporción",
+          names.arg = rownames(props),
+          ylim = c(0, 1),  # Límite del eje Y para proporciones (0-1)
           legend.text = c("Sí", "No"),
           args.legend = list(x = "topleft", bty = "n"))
 }
 
+# Ejecutar para todos los años
 par(mfrow = c(1, 3))  
-plot_p3(df20, "2020")
-plot_p3(df22, "2022")
-plot_p3(df24, "2024")
+plot_p3_prop(df20, "2020")
+plot_p3_prop(df22, "2022")
+plot_p3_prop(df24, "2024")
 par(mfrow = c(1, 1))
 
-plot_p3(df, "Total")
+plot_p3_prop(df, "Total")
 
 ```
 
@@ -329,8 +318,8 @@ plot_p5 <- function(df, year){
   labels <- c("Por trabajo", "Por estudio", "Por cultura general o estar al día", "Por gusto o por entretenimiento", "Por religión")
   names(p5_counts) <- labels
   
-  pie(p5_counts, main = paste("Motivo de lectura \n de libros -", year), col = c("lightblue","lightgreen", "gold", "lightpink", "violet"), labels = paste( round(100*p5_counts / sum(p5_counts),1), "%"))
-  legend("topleft", legend = labels, fill = c("lightblue","lightgreen","gold","lightpink","violet"), cex=0.9)
+  pie(p5_counts, main = paste("Motivo de lectura -", year), col = c("lightblue","lightgreen", "gold", "lightpink", "violet"), labels = paste( round(100*p5_counts / sum(p5_counts),1), "%"))
+  legend("topleft", legend = labels, fill = c("lightblue","lightgreen","gold","lightpink","violet"), cex=0.6)
 }
 
 par(mfrow = c(1,1))
@@ -359,8 +348,8 @@ plot_p11 <- function(df, year){
   labels <- c("Por trabajo", "Por estudio", "Por cultura general o estar al día", "Por gusto o por entretenimiento", "Por religión")
   names(p11_counts) <- labels
   
-  pie(p11_counts, main = paste("Motivo de lectura \n de revistas -", year), col = c("lightblue","lightgreen", "gold", "lightpink", "violet"), labels = paste(round(100*p11_counts / sum(p11_counts),1), "%"))
-  legend("topleft", legend = labels, fill = c("lightblue","lightgreen","gold","lightpink","violet"), cex=0.9)
+  pie(p11_counts, main = paste("Motivo de lectura -", year), col = c("lightblue","lightgreen", "gold", "lightpink", "violet"), labels = paste(round(100*p11_counts / sum(p11_counts),1), "%"))
+  legend("topleft", legend = labels, fill = c("lightblue","lightgreen","gold","lightpink","violet"), cex=0.6)
 }
 
 
@@ -390,10 +379,10 @@ plot_p25 <- function(df, year) {
   
   # Gráfico de pastel
   pie(p25_counts,
-      main = paste("Motivo de lectura \n de materiales digitales-", year),
+      main = paste("Motivo de lectura -", year),
       col = c("lightblue", "lightgreen", "gold", "lightpink", "violet"),
       labels = paste( round(100 * p25_counts / sum(p25_counts), 1), "%"))
-  legend("topleft", legend = labels, fill = c("lightblue","lightgreen","gold","lightpink","violet"), cex=0.9)
+  legend("topleft", legend = labels, fill = c("lightblue","lightgreen","gold","lightpink","violet"), cex=0.6)
 }
 
 plot_p25(df20, "2020")
@@ -408,29 +397,25 @@ Para la lectura digital en blogs o páginas de internet, se ve cómo predomina l
 En general, el contenido de cada medio de lectura varía entre sí: no existen demasiadas variaciones con respecto a los años, lo que permite trabajar con todos los datos de manera adecuada. No obstante, dependiendo del medio de lectura se consume distinto contenido, esto destaca principalmente en medios digitales: si bien en libros, revistas y lectura digital predomina la lectura por entretenimiento, en este último también predomina la lectura por cultura general. 
 
 
-###Relación entre condición de empleo y nivel educativo
-
-La variable de condición de empleo coloca de forma ordinal el tiempo que invierte a trabajar en promedio la persona.
+### Relación entre nivel educativo y motivos de lectura
 
 ```{r}
 plot(jitter(df$nivel), jitter(df$cond_act),
      xlab = "Nivel educativo",
      ylab = "Condición actual de empleo",
-     main = "Nivel educativo con respecto a \ncondición actual de empleo",
+     main = "Nivel educativo con respecto a condición actual de empleo",
      pch = 20, col = "lightblue")
-
 
 ```
 
 Se puede identificar que la mayoría de personas con mayor nivel educativo, trabajaron durante la semana de manera remunerada. Las personas sin educación o educación preescolar se dedican principalmente a las labores del hogar, mientras que aquellas con mayor nivel educativo, tienen condiciones de ocupación distintos. Por ejemplo, las personas con nivel educativo de licenciatura, en su mayoría se encuentran estudiando, se dedican a las actividades del hogar o son jubilados, además de aquel porcentaje que trabaja de manera remunerada. 
 
-### Relación entre nivel educativo y motivos de lectura
 
 ```{r}
 plot(jitter(df$nivel), jitter(df$p5),
      xlab = "Nivel educativo",
      ylab = "Motivos de lectura de libros",
-     main = "Nivel educativo con respecto a \nmotivos de lectura de libros",
+     main = "Nivel educativo con respecto a motivos de lectura de libros",
      pch = 20, col = "lightgreen")
 ```
 
@@ -441,11 +426,23 @@ No obstante, el principal motivo de lectura en cada uno de los niveles es el ent
 
 
 ```{r}
+par(mfrow = c(1, 1))
+plot(jitter(df$nivel), jitter(df$p5),
+     xlab = "Nivel educativo",
+     ylab = "Motivos de lectura de libros",
+     main = "Nivel educativo vs motivos de lectura de libros",
+     pch = 20, col = "lightgreen")
 plot(jitter(df$nivel), jitter(df$p11),
      xlab = "Nivel educativo",
      ylab = "Motivos de lectura de revistas",
-     main = "Nivel educativo con respecto a \nmotivos de lectura de revistas",
+     main = "Nivel educativo vs motivos de lectura de revistas",
      pch = 20, col = "gold")
+plot(jitter(df$nivel), jitter(df$p25),
+     xlab = "Nivel educativo",
+     ylab = "Motivos de lectura digital",
+     main = "Nivel educativo vs motivos de lectura digital",
+     pch = 20, col = "lightpink")
+
 ```
 
 En este gráfico, se puede ver nuevamente cómo los motivos de lectura difieren entre niveles educativos. La religión predomina en el nivel educativo básico, así como también el entretenimiento y cultura general. Mientras tanto, se visualiza cómo la cantidad de personas que leen por trabajo o estudio aumenta a la par del nivel educativo. Esto resulta interesante y prueba el punto de distintos motivos de lectura con respecto a la educación de cada individuo. 
@@ -454,11 +451,33 @@ En este gráfico, se puede ver nuevamente cómo los motivos de lectura difieren 
 plot(jitter(df$nivel), jitter(df$p25),
      xlab = "Nivel educativo",
      ylab = "Motivos de lectura digital",
-     main = "Nivel educativo con respecto a \nmotivos de lectura digital",
+     main = "Nivel educativo con respecto a motivos de lectura digital",
      pch = 20, col = "lightpink")
 ```
 
 Nuevamente, se ve el aumento de motivos de lectura referentes a trabajo y estudio conforme el nivel educativo aumenta. Además, se visualiza cómo la religión deja de ser un motivo de lectura recurrente en todos los niveles para los medios digitales. 
+
+```{r}
+par(mfrow = c(2,2))
+plot(jitter(df$nivel), jitter(df$p5),
+     xlab = "Nivel educativo",
+     ylab = "Motivos de lectura de libros",
+     main = "Nivel educativo con respecto a motivos de lectura de libros",
+     pch = 20, col = "lightgreen")
+
+plot(jitter(df$nivel), jitter(df$p11),
+     xlab = "Nivel educativo",
+     ylab = "Motivos de lectura de revistas",
+     main = "Nivel educativo con respecto a motivos de lectura de revistas",
+     pch = 20, col = "gold")
+
+plot(jitter(df$nivel), jitter(df$p25),
+     xlab = "Nivel educativo",
+     ylab = "Motivos de lectura digital",
+     main = "Nivel educativo con respecto a motivos de lectura digital",
+     pch = 20, col = "lightpink")
+```
+
 
 #### Tipo de contenido leído por nivel educativo
 
@@ -467,7 +486,7 @@ Nuevamente, se ve el aumento de motivos de lectura referentes a trabajo y estudi
 nombrescols <- c("Manuales", "Académicos", "Religión", "Literatura", "Cultura")
 
 for(i in 1:5){
-  df_nivel <- df[df$nivel == i, c("p6_1","p6_2","p6_3","p6_4","p6_5")]
+  df_nivel <- df[df$nivel == i & (df$p6_1 == 1 | df$p6_2 == 1 | df$p6_3 == 1 | df$p6_4 == 1 | df$p6_5 == 1), c("p6_1","p6_2","p6_3","p6_4","p6_5")]
   freqs <- colSums(df_nivel)  # suma de personas que leen cada tipo de contenido
   barplot(freqs,
           main = paste("Tipo de contenido - Nivel", i),
@@ -477,7 +496,8 @@ for(i in 1:5){
 }
 
 ```
-En este caso se observa un aumento en la proporción de textos de índole religiosa que leen los encuestados conforme aumentan los niveles de estudios. Similarmente se observa un descenso significativo de la proporción de la gente que lee textos literarios, respaldando la hipótesis inicial de que al tener mayores niveles de estudios, los encuestados tienden a tener menor tiempo de leer textos por motivos lúdicos, como usualmente se leen los textos literarios.
+Ya no voy a seguir describiendo, hagan ustedes lo demás
+
 
 ```{r}
 # Hacer 5 gráficos, uno por nivel
@@ -510,16 +530,11 @@ colnames(tabla) <- c("Libros", "Revistas", "Medios digitales")
 barplot(tabla,
         beside = TRUE,
         col = c("lightgreen","tomato"),
-        
+        legend = rownames(tabla),
         main = "Tipo de contenido leído según asistencia a primaria",
         xlab = "Tipo de contenido",
-        ylab = "Cantidad de personas", 
-        legend = rownames(tabla) 
-        )
+        ylab = "Cantidad de personas")
 
 ```
-
-
-###Apéndice
 
 
