@@ -1,5 +1,5 @@
 ---
-title: "Etapa 1. El contexto"
+title: "Etapa 1. El contexto y Etapa 2 Parte 1. Limpieza para Análisis Descriptivo"
 author: "Equipo 4"
 date: "2025-09-26"
 output: html_document
@@ -481,5 +481,6 @@ summary(MFinal)
 write.csv(MFinal, "DatosEquipo4.csv", row.names=FALSE)
 
 ```
+
 
 
