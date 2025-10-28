@@ -21,7 +21,7 @@ El análisis se llevó a cabo en **R**, utilizando técnicas como:
 - Análisis descriptivo mediante visualizaciones (gráficos jitter, tablas de frecuencias, etc.).  
 - Pruebas de hipótesis con **Chi-cuadrado** y **Fisher’s Exact Test**.  
 - Simulación de Monte Carlo para estimar valores *p* en tablas de contingencia grandes.  
-- Modelos de **regresión logística** (binomial y multinomial) para exploración predictiva.
+- Modelos de **regresión logística** (binomial) para exploración predictiva.
 
 ---
 ```
