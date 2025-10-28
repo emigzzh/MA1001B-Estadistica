@@ -1,6 +1,6 @@
 ---
-title: 'Etapa 2 Parte 2: Gráficos'
-author: "Laurie Hernández"
+title: 'Etapa 2 Parte 2: Gráficos del Análisis Descriptivo'
+author: "Equipo 4"
 date: "2025-10-10"
 output: html_document
 ---
@@ -10,7 +10,8 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
  
 # Etapa 2. Comprensión y preparación de datos
-
+Recordamos que la pregunta detonadora de la actividad es: "¿Existe una relación significativa entre el nivel educativo de las personas y sus preferencias en cuanto al tipo de contenido leído?"
+Esta pregunta debe ser recordada a lo largo de todo el análisis. 
 ## Comprensión de datos 
 
 ### 1. Variables Sociodemográficas
@@ -536,5 +537,6 @@ barplot(tabla,
         ylab = "Cantidad de personas")
 
 ```
+
 
 
